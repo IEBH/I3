@@ -68,14 +68,14 @@ var I3Instance = function I3() {
 			} else {
 				(_.castArray(manifest.inputs)).forEach((i, index) => {
 					['type'].forEach(f => {
-						if (!_.has(i, f)) err.push(`Input #${index} should have a '${f}' field`);
+						if (!_.has(i, f)) errs.push(`Input #${index} should have a '${f}' field`);
 					})
 
 					if (i.type == 'references') {
-						if (!_.has(i, 'filename')) err.push(`Input #${index} should specify a filename if the type is "references"`);
-						if (!_.has(i, 'format')) err.push(`Input #${index} should specify a reference library format`);
+						if (!_.has(i, 'filename')) errs.push(`Input #${index} should specify a filename if the type is "references"`);
+						if (!_.has(i, 'format')) errs.push(`Input #${index} should specify a reference library format`);
 					} else if (i.type == 'other') {
-						if (!_.has(i, 'accepts')) err.push(`Input #${index} should specify a glob or array of globs if the type is "other"`);
+						if (!_.has(i, 'accepts')) errs.push(`Input #${index} should specify a glob or array of globs if the type is "other"`);
 					}
 				});
 			}
@@ -83,36 +83,36 @@ var I3Instance = function I3() {
 
 			// Check worker {{{
 			if (manifest.worker.type == 'docker') {
-				if (!_.has(manifest, 'worker.base')) err.push('If worker.container == "docker", worker.base must be specified');
+				if (!_.has(manifest, 'worker.base')) errs.push('If worker.container == "docker", worker.base must be specified');
 				if (manifest.worker.build) {
-					if (!_.isString(manifest.worker.build) && !_.isArray(manifest.worker.build)) err.push('worker.build must be a string or array of strings');
-					if (_.isArray(manifest.worker.build) && !manifest.worker.build.every(i => _.isString(i))) err.push('All worker.build array items must be strings');
+					if (!_.isString(manifest.worker.build) && !_.isArray(manifest.worker.build)) errs.push('worker.build must be a string or array of strings');
+					if (_.isArray(manifest.worker.build) && !manifest.worker.build.every(i => _.isString(i))) errs.push('All worker.build array items must be strings');
 				}
 				if (manifest.worker.command) {
-					if (!_.isString(manifest.worker.command) && !_.isArray(manifest.worker.command)) err.push('worker.command must be a string or array of strings');
-					if (_.isArray(manifest.worker.command) && !manifest.worker.command.every(i => _.isString(i))) err.push('All worker.command array items must be strings');
+					if (!_.isString(manifest.worker.command) && !_.isArray(manifest.worker.command)) errs.push('worker.command must be a string or array of strings');
+					if (_.isArray(manifest.worker.command) && !manifest.worker.command.every(i => _.isString(i))) errs.push('All worker.command array items must be strings');
 				}
 			} else if (manifest.worker.type == 'url') {
-				if (!_.has(manifest, 'worker.url')) err.push('If worker.container == "url", worker.url must be specified');
+				if (!_.has(manifest, 'worker.url')) errs.push('If worker.container == "url", worker.url must be specified');
 			} else {
-				err.push('worker.type has an invalid worker type');
+				errs.push('worker.type has an invalid worker type');
 			}
 
 			if (manifest.worker.environment) {
-				if (!_.isPlainObject(manifest.worker.environment)) err.push('worker.envionment must be an object');
-				if (_.every(manifest.worker.environment, (v, k) => _.isString(v) && _.isString(k))) err.push('worker.envionment must be an object of string key / values only');
+				if (!_.isPlainObject(manifest.worker.environment)) errs.push('worker.envionment must be an object');
+				if (_.every(manifest.worker.environment, (v, k) => _.isString(v) && _.isString(k))) errs.push('worker.envionment must be an object of string key / values only');
 			}
 			// }}}
 
 			// Check outputs {{{
 			(manifest.outputs ? _.castArray(manifest.outputs) : []).forEach((i, index) => {
 				['type'].forEach(f => {
-					if (!_.has(i, f)) err.push({type: 'critical', text: `Output #${index} should have a '${f}' field`});
+					if (!_.has(i, f)) errs.push({type: 'critical', text: `Output #${index} should have a '${f}' field`});
 				})
 			});
 			// }}}
 
-			if (errs.length) Promise.reject(errs.join(', '));
+			if (errs.length) return Promise.reject(errs.join(', '));
 		}).then(()=> manifest);
 
 
