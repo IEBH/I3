@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var colors = require('chalk');
+var crypto = require('crypto');
 var debug = require('debug')('i3');
 var eventer = require('@momsfriendlydevco/eventer');
 
@@ -17,6 +18,13 @@ var I3Instance = function I3() {
 	i3.settings = {
 		docker: {
 			runArgs: [], // Additional args to feed when running `docker build`
+		},
+		apps: {
+			cachePath: `${__dirname}/data/appCache`,
+			appHasher: url => crypto
+				.createHmac('sha256', '')
+				.update(url)
+				.digest('hex')
 		},
 	};
 
