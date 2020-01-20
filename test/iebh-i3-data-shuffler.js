@@ -18,7 +18,6 @@ describe('@iebh/i3-data-shuffler', ()=> {
 
 	before('app validateManifest', ()=>
 		app.validateManifest(app.manifest)
-			.then(manifest => expect(manifest).to.have.property('name'))
 			.catch(e => expect.fail(e))
 	);
 
