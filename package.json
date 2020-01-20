@@ -10,7 +10,7 @@
   "author": "Matt Carter <m@ttcarter.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=10.10.0"
+    "node": ">=12.14.1"
   },
   "dependencies": {
     "@momsfriendlydevco/eventer": "^1.4.0",

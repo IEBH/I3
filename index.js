@@ -8,14 +8,17 @@ var eventer = require('@momsfriendlydevco/eventer');
 * I3 main instance
 * @emits log Emitted on any log event of this or any child class
 */
-var I3Instance = function I3() {
-	var i3 = this;
+class I3 extends eventer {
+	constructor() {
+		super();
+		this.log.colors = colors;
+	};
 
 	/**
 	* Available I3 classes
 	* @var {Object}
 	*/
-	i3.classes = {
+	classes = {
 		app: require('./lib/app'),
 	};
 
@@ -24,7 +27,7 @@ var I3Instance = function I3() {
 	* Settings object
 	* @var {Object}
 	*/
-	i3.settings = {
+	settings = {
 		docker: {
 			runArgs: [], // Additional args to feed when running `docker build`
 		},
@@ -41,18 +44,12 @@ var I3Instance = function I3() {
 	/**
 	* Debugger and general output function
 	* With apps this is prefixed with the app name
+	* Also includes the `log.colors` convience object which provides a Chalk instance
 	*/
-	i3.log = (...msg) => {
+	log = (...msg) => {
 		debug(...msg);
-		return i3.emit('log', ...msg);
+		return this.emit('log', ...msg);
 	};
-
-
-	/**
-	* Convenience mapping to access Chalk coloring
-	* @var {Chalk}
-	*/
-	i3.log.colors = colors;
 
 
 	/**
@@ -60,8 +57,8 @@ var I3Instance = function I3() {
 	* @param {string} path Path to the i3.json file (can also be a URL)
 	* @returns {I3App} An I3 app instance
 	*/
-	i3.createApp = path => {
-		var app = new i3.classes.app(i3);
+	createApp = path => {
+		var app = new this.classes.app(this);
 		app.path = path;
 		return app;
 	};
@@ -70,9 +67,9 @@ var I3Instance = function I3() {
 	/**
 	* Validate a manifest schema
 	* @param {Object} manifest The input manifest object
-	* @returns {Promise} A promise which will either return with the manifest object or throw with a CSV of errors
+	* @returns {Promise <Object>} A promise which will either return with the manifest object or throw with a CSV of errors
 	*/
-	i3.validateManifest = manifest => Promise.resolve()
+	validateManifest = manifest => Promise.resolve()
 		.then(()=> {
 			var errs = [];
 
@@ -136,11 +133,6 @@ var I3Instance = function I3() {
 
 			if (errs.length) return Promise.reject(errs.join(', '));
 		}).then(()=> manifest);
-
-
-	eventer.extend(i3);
-
-	return i3;
 };
 
-module.exports = I3Instance();
+module.exports = new I3();
