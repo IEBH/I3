@@ -11,10 +11,19 @@ var eventer = require('@momsfriendlydevco/eventer');
 var I3Instance = function I3() {
 	var i3 = this;
 
+	/**
+	* Available I3 classes
+	* @var {Object}
+	*/
 	i3.classes = {
 		app: require('./lib/app'),
 	};
 
+
+	/**
+	* Settings object
+	* @var {Object}
+	*/
 	i3.settings = {
 		docker: {
 			runArgs: [], // Additional args to feed when running `docker build`
@@ -37,7 +46,13 @@ var I3Instance = function I3() {
 		debug(...msg);
 		return i3.emit('log', ...msg);
 	};
-	i3.log.colors = colors; // Convenience function to access coloring
+
+
+	/**
+	* Convenience mapping to access Chalk coloring
+	* @var {Chalk}
+	*/
+	i3.log.colors = colors;
 
 
 	/**
