@@ -3,6 +3,7 @@
 // ^^^ Weird hack to disable warnings - https://gist.github.com/rachidbch/5985f5fc8230b45c4b516ce1c14f0832
 
 
+var _ = require('lodash');
 var axios = require('axios');
 var commander = require('commander'); require('commander-extras');
 var fspath = require('path');
@@ -13,11 +14,12 @@ var program = commander
 	.name('i3')
 	.usage('--task <ID>')
 	.option('--local <path>', 'Use a local SRA3 setup rather than trying to connect to the SRA3 API remotely, path should point to the root directory of the server')
-	.option('-o, --opt <key=val...>', 'CSV of dotted notation config options to populate')
+	.option('-o, --opt <key=val...>', 'CSV of dotted notation config options to populate', (v, t) => t.concat(v.split(/\s*,\s*/)), [])
 	.option('-t, --task <task>', 'Specify the SRA3 taskID to process')
 	.option('--debug', 'Enable debug mode. Shows more complex traces on errors')
 	.option('--api-endpoint <URL>', 'Override the default API endpoint (default is \'https://beta.sr-accelerator.com\')', 'https://beta.sr-accelerator.com')
 	.note('Multiple config options can be provided via `-o opt1=val1,opt2=val2`')
+	.note('Options without values are assumed to be `=true` e.g. `-o o1=1,o2,o3`')
 	.parse(process.argv)
 
 
@@ -26,6 +28,19 @@ Promise.resolve()
 	// Sanity checks {{{
 	.then(()=> {
 		if (!program.task) throw new Error('`--task <ID>` must be specified');
+	})
+	// }}}
+	// Process config {{{
+	.then(()=> {
+		program.opt = program.opt.reduce((t, v) => {
+			var optBits = /^(.+?)=(.*)$/.exec(v);
+			if (optBits) { // key=val
+				_.set(t, optBits[1], optBits[2]);
+			} else { // key=true
+				_.set(t, v, true);
+			}
+			return t;
+		}, {})
 	})
 	// }}}
 	// IF --local mode {{{
@@ -51,8 +66,8 @@ Promise.resolve()
 	// Fetch data {{{
 	.then(()=>
 		program.local
-			? db.tasks.findOne({_id: taskID, $errNotFound: false})
-			: axios.get(`${program.apiEndpoint}/api/tasks/${taskID}`)
+			? db.tasks.findOne({_id: program.taskID, $errNotFound: false})
+			: axios.get(`${program.apiEndpoint}/api/tasks/${program.taskID}`)
 				.then(res => res.data)
 	)
 	.then(res => res || Promise.reject('Task not found'))
