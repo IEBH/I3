@@ -91,7 +91,6 @@ var I3Instance = function I3() {
 
 			// Check worker {{{
 			if (manifest.worker.type == 'docker') {
-				if (!_.has(manifest, 'worker.base')) errs.push('If worker.container == "docker", worker.base must be specified');
 				if (manifest.worker.build) {
 					if (!_.isString(manifest.worker.build) && !_.isArray(manifest.worker.build)) errs.push('worker.build must be a string or array of strings');
 					if (_.isArray(manifest.worker.build) && !manifest.worker.build.every(i => _.isString(i))) errs.push('All worker.build array items must be strings');
@@ -108,7 +107,7 @@ var I3Instance = function I3() {
 
 			if (manifest.worker.environment) {
 				if (!_.isPlainObject(manifest.worker.environment)) errs.push('worker.envionment must be an object');
-				if (_.every(manifest.worker.environment, (v, k) => _.isString(v) && _.isString(k))) errs.push('worker.envionment must be an object of string key / values only');
+				if (!_.every(manifest.worker.environment, (v, k) => _.isString(v) && _.isString(k))) errs.push('worker.envionment must be an object of string key / values only');
 			}
 			// }}}
 
