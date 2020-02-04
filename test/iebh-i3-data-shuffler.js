@@ -47,7 +47,7 @@ describe('@iebh/i3-data-shuffler', ()=> {
 
 	it('should be able to run a basic operation', function() {
 		var config = {
-			inputs: [`${__dirname}/data/references.csv`],
+			inputs: [`${__dirname}/data/references-md.csv`],
 			outputs: [temp.path({prefix: 'i3-test-'})],
 		};
 
