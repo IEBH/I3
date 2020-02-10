@@ -133,7 +133,6 @@ Promise.resolve()
 				))
 				// }}}
 				// Setup app {{{
-				.then(()=> session.task.app = '/home/mc/Dropbox/Projects/IEBH-SRA3/data/apps/i3-data-shuffler/i3.json')// FIXME: DEBUGGING
 				.then(()=> session.app = i3.createApp(session.task.app))
 				// }}}
 		}
