@@ -5,6 +5,65 @@ I3 - IEBH Integration Engine (NodeJS).
 For internal use see the [API reference](API.md).
 
 
+Installation
+============
+1. Ensure you have an existing [NodeJS setup](https://nodejs.org/en/download) along with [Git](https://git-scm.com/downloads).
+
+
+2. Install the command line interface via NPM:
+
+```
+npm install --global @iebh/i3
+```
+
+(You may need a `sudo` prefix depending on your Node setup)
+
+
+3. You should now be able to us I3 with the command line interface `i3`. For example to check the version:
+
+```
+i3 --version
+```
+
+
+Usage
+=====
+
+```
+Usage: i3 <--app URL | --task ID> [options]
+
+Options:
+  -V, --version           output the version number
+  --app <url>             Specify an I3 App URL
+  --input <file>          Specify an input data file - can be specified
+                          multiple times (default: [])
+  --output <file>         Specify an output data file - can be specified
+                          multiple times (default: [])
+  -t, --task <task>       Specify the SRA3 taskID to process
+  --task-local <path>     Use a local SRA3 setup rather than trying to connect
+                          to the SRA3 API remotely, path should point to the
+                          root directory of the server
+  -o, --opt <key=val...>  CSV of dotted notation config options to populate
+                          (default: [])
+  --debug                 Enable debug mode. Shows more complex traces on
+                          errors
+  --api-endpoint <URL>    Override the default API endpoint (default:
+                          "https://beta.sr-accelerator.com")
+  -v, --verbose           Be verbose, specify multiple times for more verbosity
+  -h, --help              output usage information
+
+Notes:
+  * Multiple config options can be provided via `-o opt1=val1,opt2=val2`
+  * Options without values are assumed to be `=true` e.g. `-o o1=1,o2,o3`
+
+Examples:
+
+  # Filter only for RCTs
+  i3 --app https://github.com/ESHackathon/RCT_Predictor.git --input test/data/endnote-sm.xml --output refs.csv
+```
+
+
+
 Examples
 ========
 
@@ -28,8 +87,7 @@ SRA3 task
 Run a task from the [http://sr-accelerator.com](SR-Accelerator) website.
 
 ```
-> i3 \
---task 1234567890
+> i3 --task 1234567890
 ```
 
 
@@ -42,10 +100,10 @@ For example:
 The following debug flags are supported:
 
 
-| Debugging flag         | Definition                         |
-|------------------------|------------------------------------|
-| `i3`         | General I3 debugging information             |
-| `i3:noClean` | Do not clean up when completing an operation |
+| Debugging flag         | Definition                                   |
+|------------------------|----------------------------------------------|
+| `i3`                   | General I3 debugging information             |
+| `i3:noClean`           | Do not clean up when completing an operation |
 
 
 **NOTES:**
