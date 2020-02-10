@@ -2,6 +2,12 @@
 =========================
 I3 - IEBH Integration Engine (NodeJS).
 
+The I3 represents an attempt to define the integration between different Systematic Review apps with an aim to entirely automating the communication between these individual stages.
+
+* [OSF Technical Standards Documentation](https://osf.io/3kd58)
+* [I3 specification](https://github.com/icasr/I3)
+
+
 For internal use see the [API reference](API.md).
 
 
@@ -61,6 +67,11 @@ Examples:
   # Filter only for RCTs
   i3 --app https://github.com/ESHackathon/RCT_Predictor.git --input test/data/endnote-sm.xml --output refs.csv
 ```
+
+
+API Usage
+=========
+For internal use see the [API reference](API.md).
 
 
 
