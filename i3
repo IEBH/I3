@@ -40,7 +40,7 @@ Promise.resolve()
 	// Sanity checks {{{
 	.then(()=> {
 		if (program.app && program.task) {
-			throw new Error('Cannot specify BOTH --app + --task');
+			throw new Error('Cannot specify BOTH --app & --task');
 		} else if (program.app) { // App mode
 			if (program.taskLocal) throw new Error('Cannot specify --task-local with --app');
 		} else if (program.task) { // SRA task mode
