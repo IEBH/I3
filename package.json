@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@momsfriendlydevco/eventer": "^1.4.0",
-    "@momsfriendlydevco/exec": "^1.5.0",
+    "@momsfriendlydevco/exec": "^1.5.2",
     "@momsfriendlydevco/macgyver": "git+https://github.com/MomsFriendlyDevCo/MacGyver2.git#master",
     "@momsfriendlydevco/template": "^1.1.2",
     "axios": "^0.19.1",
