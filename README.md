@@ -96,6 +96,18 @@ This example will scan an input reference library (`endnote-sm.xml`) and output 
 Also available in the [testkit via API calls](./test/rct_predictor.js).
 
 
+deduplicate references
+----------------------
+Use the [SRA-Dedupe](FIXME) module to deduplicate references within a set.
+
+```
+./i3 \
+--app https://github.com/IEBH/sra-dedupe.git \
+--input test/data/endnote-sm.xml \
+--output deduped.xml
+```
+
+
 SRA3 task
 ---------
 Run a task from the [http://sr-accelerator.com](SR-Accelerator) website.
