@@ -4,6 +4,7 @@ var _ = require('lodash');
 var axios = require('axios');
 var colors = require('chalk');
 var commander = require('commander'); require('commander-extras');
+var debug = require('debug')('i3');
 var fspath = require('path');
 var i3 = require('./index');
 
@@ -163,7 +164,7 @@ Promise.resolve()
 	// }}}
 	// End {{{
 	.catch(e => {
-		console.warn(program.debug ? e : e.toString());
+		console.warn(program.debug || debug.enabled ? e : e.toString());
 		process.exit(1);
 	})
 	// }}}
