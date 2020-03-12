@@ -21,6 +21,7 @@ var program = commander
 	.option('--debug', 'Enable debug mode. Shows more complex traces on errors')
 	.option('--api-endpoint <URL>', 'Override the default API endpoint', 'https://beta.sr-accelerator.com')
 	.option('-v, --verbose', 'Be verbose, specify multiple times for more verbosity', (t, v) => v++, 0)
+	.option('-s, --shell', 'Instead of running the regular entry point commands, open a shell and prompt the user to do so manually - used for debugging')
 	.note('Multiple config options can be provided via `-o opt1=val1,opt2=val2`')
 	.note('Options without values are assumed to be `=true` e.g. `-o o1=1,o2,o3`')
 	.example('i3 --app https://github.com/ESHackathon/RCT_Predictor.git --input test/data/endnote-sm.xml --output refs.csv', 'Filter only for RCTs')
@@ -141,6 +142,7 @@ Promise.resolve()
 	// }}}
 	// Run app {{{
 	.then(()=> program.verbose > 1 && console.log('Init app'))
+	.then(()=> { if (program.shell) session.app.wantShell = true })
 	.then(()=> session.app.init())
 	.then(()=> {
 		if (program.verbose) console.log('Run app', app.id);
