@@ -90,6 +90,9 @@ This was a project at the [Evidence Synthesis Hackathon (Canberra 2019)](https:/
 --output refs.csv
 ```
 
+This example will scan an input reference library (`endnote-sm.xml`) and output a CSV (`refs.csv`) with one additional field (`is_rct`).
+
+
 Also available in the [testkit via API calls](./test/rct_predictor.js).
 
 
