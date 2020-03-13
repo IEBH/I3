@@ -25,6 +25,7 @@ var program = commander
 	.note('Multiple config options can be provided via `-o opt1=val1,opt2=val2`')
 	.note('Options without values are assumed to be `=true` e.g. `-o o1=1,o2,o3`')
 	.example('i3 --app https://github.com/ESHackathon/RCT_Predictor.git --input test/data/endnote-sm.xml --output refs.csv', 'Filter only for RCTs')
+	.example('i3 --app https://github.com/IEBH/sra-dedupe.git --input test/data/endnote-sm.xml --output deduped.xml', 'Deduplicate a list of references')
 	.parse(process.argv)
 
 
