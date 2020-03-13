@@ -5,6 +5,7 @@ var axios = require('axios');
 var colors = require('chalk');
 var commander = require('commander'); require('commander-extras');
 var debug = require('debug')('i3');
+var fs = require('fs');
 var fspath = require('path');
 var i3 = require('./index');
 
@@ -77,12 +78,20 @@ Promise.resolve()
 	.then(()=> {
 		if (!program.task) return;
 
-		if (!program.taskLocal) {
+		if (program.taskLocal) {
+			program.taskLocal = fspath.resolve(program.taskLocal);
 			if (program.verbose) console.log('Using local server for task data');
+
 			return Promise.resolve()
 				.then(()=> process.argv = []) // Reset ARGV so the app loader doesnt mistake it for its own arguments
-				.then(()=> process.chdir(program.local))
-				.then(()=> require(fspath.join(program.local, 'app')).setup()) // Setup global app object
+				.then(()=> process.chdir(program.taskLocal))
+				.then(()=> Promise.all(['.gitignore', 'app/index.js', 'app/setup.js', 'config/index.js'].map(file => // Sanity check for recognised files
+					fs.promises.access(fspath.join(program.taskLocal, file), fs.constants.R_OK)
+						.then(()=> true)
+						.catch(()=> false))
+				))
+				.then(fileAccess => fileAccess.every(i => i) || Promise.reject(`Directory "${program.taskLocal}" does not look like the SRA3 root directory`))
+				.then(()=> require(fspath.join(program.taskLocal, 'app')).setup()) // Setup global app object
 				.then(()=> app.emit('dbInit')) // Setup all DB functionality...
 				.then(()=> app.emit('dbMiddleware'))
 				.then(()=> app.emit('preSchemas'))
@@ -90,7 +99,7 @@ Promise.resolve()
 				.then(()=> app.emit('postSchemas'))
 		} else {
 			if (program.verbose > 1) console.log('Using remote server for task data');
-			console.warn('WARNING:', 'Remote task support is experiemental');
+			console.warn('WARNING:', 'Remote task support is experimental');
 		}
 	})
 	// }}}
@@ -100,7 +109,7 @@ Promise.resolve()
 			// Running locally, no need to fetch task data
 			session.app = i3.createApp(program.app);
 		} else {
-			return Promise.all()
+			return Promise.resolve()
 				// Fetch task from server {{{
 				.then(()=> program.verbose && console.log('Fetching task data'))
 				.then(()=>

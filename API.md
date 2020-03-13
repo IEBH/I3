@@ -79,6 +79,7 @@ An I3 App
     * [.manifest](#I3App+manifest) : <code>Object</code>
     * [.name](#I3App+name) : <code>string</code>
     * [.log](#I3App+log)
+    * [.wantShell](#I3App+wantShell) : <code>boolean</code> \| <code>string</code>
     * [.init](#I3App+init) ⇒ [<code>Promise.&lt;I3App&gt;</code>](#I3App)
     * [.validateManifest](#I3App+validateManifest) ⇒ <code>Promise</code>
     * [.build](#I3App+build) ⇒ <code>Promise</code>
@@ -138,6 +139,13 @@ This object also contains {warn, colors} convenience functions (see controller)
 | --- | --- | --- |
 | [msg...] | <code>\*</code> | Output message components |
 
+<a name="I3App+wantShell"></a>
+
+### i3App.wantShell : <code>boolean</code> \| <code>string</code>
+Whether to run the specified command within the finished Docker shell or just dump the user at a shell prompt
+If boolean true this defaults to '/bin/sh' otherwise specify the binary to run as a string path
+
+**Kind**: instance property of [<code>I3App</code>](#I3App)
 <a name="I3App+init"></a>
 
 ### i3App.init ⇒ [<code>Promise.&lt;I3App&gt;</code>](#I3App)
