@@ -113,9 +113,10 @@ Promise.resolve()
 				// Fetch task from server {{{
 				.then(()=> program.verbose && console.log('Fetching task data'))
 				.then(()=>
-					program.local
-						? db.tasks.findOne({_id: program.taskID, $errNotFound: false})
-						: axios.get(`${program.apiEndpoint}/api/tasks/${program.taskID}`)
+					program.taskLocal
+						? db.tasks.findOne({_id: program.task, $errNotFound: false})
+							.then(doc => doc || Promise.reject('Task not found in database'))
+						: axios.get(`${program.apiEndpoint}/api/tasks/${program.task}`)
 							.then(res => res.data)
 				)
 				.then(res => res || Promise.reject('Task not found'))
@@ -125,7 +126,7 @@ Promise.resolve()
 				.then(()=> Promise.all(
 					// Populate session.task.inputs[].file
 					session.task.inputs.map((input, inputOffset) =>
-						(program.local ?
+						(program.taskLocal ?
 							db.files.findOneByID(input.file)
 							: axios.get(`${program.apiEndpoint}/api/files/${input.file}`)
 						)
@@ -135,7 +136,7 @@ Promise.resolve()
 
 					// Populate session.task.outputs[].file
 					session.task.outputs.map((output, outputOffset) => // Populate session.task.outputs[].file
-						(program.local ?
+						(program.taskLocal ?
 							db.files.findOneByID(output.file)
 							: axios.get(`${program.apiEndpoint}/api/files/${output.file}`)
 						)
