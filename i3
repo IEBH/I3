@@ -17,7 +17,6 @@ var program = commander
 	.option('--input <file>', 'Specify an input data file - can be specified multiple times', (v, t) => t.concat([v]), [])
 	.option('--output <file>', 'Specify an output data file - can be specified multiple times', (v, t) => t.concat([v]), [])
 	.option('-t, --task <task>', 'Specify the SRA3 taskID to process')
-	.option('--task-local <path>', 'Use a local SRA3 setup rather than trying to connect to the SRA3 API remotely, path should point to the root directory of the server')
 	.option('-o, --opt <key=val...>', 'CSV of dotted notation config options to populate', (v, t) => t.concat(v.split(/\s*,\s*/)), [])
 	.option('--debug', 'Enable debug mode. Shows more complex traces on errors')
 	.option('--api-endpoint <URL>', 'Override the default API endpoint', 'https://beta.sr-accelerator.com')
@@ -46,7 +45,7 @@ Promise.resolve()
 		if (program.app && program.task) {
 			throw new Error('Cannot specify BOTH --app & --task');
 		} else if (program.app) { // App mode
-			if (program.taskLocal) throw new Error('Cannot specify --task-local with --app');
+			// Pass
 		} else if (program.task) { // SRA task mode
 			if (program.input.length || program.output.length) throw new Error('Cannot specify input / output files when in Task mode');
 		} else {
@@ -74,51 +73,25 @@ Promise.resolve()
 	// I3 setup {{{
 	.then(()=> i3.on('log', console.log))
 	// }}}
-	// IF --task (use the SRA3 API endpoint) {{{
+	// If --task (use the SRA3 API endpoint) {{{
 	.then(()=> {
 		if (!program.task) return;
 
-		if (program.taskLocal) {
-			program.taskLocal = fspath.resolve(program.taskLocal);
-			if (program.verbose) console.log('Using local server for task data');
-
-			return Promise.resolve()
-				.then(()=> process.argv = []) // Reset ARGV so the app loader doesnt mistake it for its own arguments
-				.then(()=> process.chdir(program.taskLocal))
-				.then(()=> Promise.all(['.gitignore', 'app/index.js', 'app/setup.js', 'config/index.js'].map(file => // Sanity check for recognised files
-					fs.promises.access(fspath.join(program.taskLocal, file), fs.constants.R_OK)
-						.then(()=> true)
-						.catch(()=> false))
-				))
-				.then(fileAccess => fileAccess.every(i => i) || Promise.reject(`Directory "${program.taskLocal}" does not look like the SRA3 root directory`))
-				.then(()=> require(fspath.join(program.taskLocal, 'app')).setup()) // Setup global app object
-				.then(()=> app.emit('dbInit')) // Setup all DB functionality...
-				.then(()=> app.emit('dbMiddleware'))
-				.then(()=> app.emit('preSchemas'))
-				.then(()=> app.emit('schemas'))
-				.then(()=> app.emit('postSchemas'))
-		} else {
-			if (program.verbose > 1) console.log('Using remote server for task data');
-			console.warn('WARNING:', 'Remote task support is experimental');
-		}
+		if (program.verbose > 1) console.log('Using remote server for task data');
+		console.warn('WARNING:', 'Remote task support is experimental');
 	})
 	// }}}
 	// Setup app (pull data from server if !!program.task OR init app locally if not) {{{
 	.then(()=> {
-		if (program.app) {
+		if (program.app) { // Fetch specific app by name
 			// Running locally, no need to fetch task data
 			session.app = i3.createApp(program.app);
-		} else {
+		} else { // Fetch task document from remote and use that to populate app info
 			return Promise.resolve()
 				// Fetch task from server {{{
 				.then(()=> program.verbose && console.log('Fetching task data'))
-				.then(()=>
-					program.taskLocal
-						? db.tasks.findOne({_id: program.task, $errNotFound: false})
-							.then(doc => doc || Promise.reject('Task not found in database'))
-						: axios.get(`${program.apiEndpoint}/api/tasks/${program.task}`)
-							.then(res => res.data)
-				)
+				.then(()=> axios.get(`${program.apiEndpoint}/api/tasks/${program.task}`))
+				.then(res => res.data)
 				.then(res => res || Promise.reject('Task not found'))
 				.then(res => session.task = res)
 				// }}}
@@ -146,7 +119,7 @@ Promise.resolve()
 				))
 				// }}}
 				// Setup app {{{
-				.then(()=> session.app = i3.createApp(session.task.app))
+				.then(()=> session.app = i3.createApp(`${program.apiEndpoint}/api/apps/${session.task.app.id}`))
 				// }}}
 		}
 	})
