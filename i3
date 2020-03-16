@@ -20,7 +20,7 @@ var program = commander
 	.option('-o, --opt <key=val...>', 'CSV of dotted notation config options to populate', (v, t) => t.concat(v.split(/\s*,\s*/)), [])
 	.option('--debug', 'Enable debug mode. Shows more complex traces on errors')
 	.option('--api-endpoint <URL>', 'Override the default API endpoint', 'https://beta.sr-accelerator.com')
-	.option('-v, --verbose', 'Be verbose, specify multiple times for more verbosity', (t, v) => v++, 0)
+	.option('-v, --verbose', 'Be verbose, specify multiple times for more verbosity', (t, v) => v + 1, 0)
 	.option('-s, --shell', 'Instead of running the regular entry point commands, open a shell and prompt the user to do so manually - used for debugging')
 	.note('Multiple config options can be provided via `-o opt1=val1,opt2=val2`')
 	.note('Options without values are assumed to be `=true` e.g. `-o o1=1,o2,o3`')
