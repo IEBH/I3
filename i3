@@ -98,29 +98,6 @@ Promise.resolve()
 				.then(res => res || Promise.reject('Task not found'))
 				.then(res => session.task = res)
 				// }}}
-				// Tidy up input / output files {{{
-				.then(()=> Promise.all(
-					// Populate session.task.inputs[].file
-					session.task.inputs.map((input, inputOffset) =>
-						(program.taskLocal ?
-							db.files.findOneByID(input.file)
-							: axios.get(`${program.apiEndpoint}/api/files/${input.file}`)
-						)
-							.then(file => file || Promise.reject(`Invalid input file ID "${input.file}"`))
-							.then(file => session.task.inputs[inputOffset].file = file)
-					),
-
-					// Populate session.task.outputs[].file
-					session.task.outputs.map((output, outputOffset) => // Populate session.task.outputs[].file
-						(program.taskLocal ?
-							db.files.findOneByID(output.file)
-							: axios.get(`${program.apiEndpoint}/api/files/${output.file}`)
-						)
-							.then(file => file || Promise.reject(`Invalid output file ID "${output.file}"`))
-							.then(file => session.task.outputs[outputOffset].file = file)
-					),
-				))
-				// }}}
 				// Setup app {{{
 				.then(()=> session.app = i3.createApp(`${program.apiEndpoint}/api/apps/${session.task.app.id}`))
 				// }}}
