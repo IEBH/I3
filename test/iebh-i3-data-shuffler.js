@@ -7,14 +7,13 @@ var temp = require('temp');
 describe('@iebh/i3-data-shuffler', ()=> {
 
 	var app;
-	before('app init', function() {
-		return i3
+	before('app init', ()=> i3
 		.createApp('https://github.com/IEBH/I3-data-shuffler.git')
 		.init({
 			validate: false, build: false, // We conduct these phases manually below so we can track for debugging
 		})
 		.then(res => app = res)
-	});
+	);
 
 	before('app validateManifest', ()=>
 		app.validateManifest(app.manifest)
