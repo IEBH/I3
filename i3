@@ -124,6 +124,9 @@ Promise.resolve()
 				// Setup app {{{
 				.then(()=> session.app = i3.createApp(`${program.apiEndpoint}/api/apps/${session.task.app.id}`))
 				// }}}
+				// Add log entry to indicate we're working on this task {{{
+				.then(()=> axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {contents: 'Preparing to run task', type: 'system'}))
+				// }}}
 		}
 	})
 	// }}}
@@ -132,10 +135,10 @@ Promise.resolve()
 	.then(()=> { if (program.shell) session.app.wantShell = true })
 	.then(()=> session.app.init())
 	.then(()=> {
-		if (program.verbose) console.log('Run app', app.id);
+		if (program.verbose) console.log('Run app', session.app.id);
 
 		if (program.app) { // Use local CLI data only
-			session.app.run({
+			return session.app.run({
 				config: program.opt,
 				inputs: program.input,
 				outputs: program.output,
@@ -143,10 +146,11 @@ Promise.resolve()
 		} else { // Use task data to populate run
 			if (!_.isEmpty(program.opt)) console.log(colors.yellow('WARN'), 'Overriding config with local CLI options');
 
-			session.app.run({
-				config: !_.isEmpty(program.opt) ? program.opt : task.config,
-				inputs: task.inputs.map(input => input.file.path),
-				outputs: task.outputs.map(output => output.file.path),
+			axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {contents: 'Execute task', type: 'system'})
+			return session.app.run({
+				config: !_.isEmpty(program.opt) ? program.opt : session.task.config,
+				inputs: session.task.inputs.map(input => input.url ? {url: input.url, filename: input.filename} : null),
+				outputs: session.task.outputs.map(output => output.url && output.url ? output.url : null),
 			});
 		}
 	})
