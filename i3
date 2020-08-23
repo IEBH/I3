@@ -89,7 +89,7 @@ Promise.resolve()
 		if (program.app) { // Fetch specific app by name
 			// Running locally, no need to fetch task data
 			session.app = i3.createApp(program.app);
-		} else { // Fetch task document from remote and use that to populate app info
+		} else if (program.task) { // Fetch task document from remote and use that to populate app info
 			return Promise.resolve()
 				// Fetch task from server {{{
 				.then(()=> program.verbose && console.log('Fetching task data'))
@@ -101,8 +101,14 @@ Promise.resolve()
 				// Setup app {{{
 				.then(()=> session.app = i3.createApp(`${program.apiEndpoint}/api/apps/${session.task.app.id}`))
 				// }}}
-				// Add log entry to indicate we're working on this task {{{
-				.then(()=> axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {contents: 'Preparing to run task', type: 'system'}))
+				// Add log entry + set status to indicate we're working on this task {{{
+				.then(()=> Promise.all([
+					// Create log entry
+					axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {type: 'system', contents: 'Preparing to run task via I3 CLI'}),
+
+					// Change task status
+					axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/status`, {status: 'active'}),
+				]))
 				// }}}
 		}
 	})
