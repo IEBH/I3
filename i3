@@ -123,11 +123,23 @@ Promise.resolve()
 		} else { // Use task data to populate run
 			if (!_.isEmpty(program.opt)) console.log(colors.yellow('WARN'), 'Overriding config with local CLI options');
 
-			axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {contents: 'Execute task', type: 'system'})
+			axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {type: 'system', contents: 'Execute task'})
+
+			session.app.once('requestRedirect', redirectObject => {
+				axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/logs`, {
+					type: 'system',
+					contents: `Request redirect to ${redirectObject.url}`,
+				})
+
+				axios.post(`${program.apiEndpoint}/api/tasks/${program.task}/redirect`, {
+					redirect: redirectObject,
+				})
+			});
+
 			return session.app.run({
 				config: !_.isEmpty(program.opt) ? program.opt : session.task.config,
-				inputs: session.task.inputs.map(input => input.url ? {url: input.url, filename: input.filename} : null),
-				outputs: session.task.outputs.map(output => output.url && output.url ? output.url : null),
+				inputs: session.task.inputs.map(input => input.url ? input.url : null),
+				outputs: session.task.outputs.map(output => output.url || null),
 			});
 		}
 	})
