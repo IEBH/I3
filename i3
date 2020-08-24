@@ -23,7 +23,6 @@ var program = commander
 	.option('-v, --verbose', 'Be verbose, specify multiple times for more verbosity', (t, v) => v + 1, 0)
 	.option('-s, --shell', 'Instead of running the regular entry point commands, open a shell and prompt the user to do so manually - used for debugging')
 	.option('--timeout <milliseconds>', 'Change default HTTP timeout', 5000)
-	.option('--localhost', 'Enable all localhost + loopback + SSL disable settings for localhost usage (implies --api-endpoint=http://localhost)')
 	.note('Multiple config options can be provided via `-o opt1=val1,opt2=val2`')
 	.note('Options without values are assumed to be `=true` e.g. `-o o1=1,o2,o3`')
 	.example('i3 --app https://github.com/ESHackathon/RCT_Predictor.git --input test/data/endnote-sm.xml --output refs.csv', 'Filter only for RCTs')
@@ -59,11 +58,6 @@ Promise.resolve()
 	// }}}
 	// Process config {{{
 	.then(()=> {
-		if (program.localhost) {
-			process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; // Disable TLS certificate checking
-			program.apiEndpoint = 'http://localhost';
-		}
-
 		program.opt = program.opt.reduce((t, v) => {
 			var optBits = /^(.+?)=(.*)$/.exec(v);
 			if (optBits) { // key=val
@@ -80,9 +74,7 @@ Promise.resolve()
 	})
 	// }}}
 	// I3 setup {{{
-	.then(()=> {
-		i3.on('log', console.log);
-	})
+	.then(()=> i3.on('log', console.log))
 	// }}}
 	// If --task (use the SRA3 API endpoint) {{{
 	.then(()=> {
